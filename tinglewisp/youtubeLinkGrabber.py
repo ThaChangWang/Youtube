@@ -31,7 +31,7 @@ if __name__ == "__main__":
 	time.sleep(3)
 
 	#Search for creative commons ASMR videos
-	driver.get("https://www.youtube.com/results?search_query=ASMR&sp=CAISBhABGAIwAQ%253D%253D")
+	driver.get("https://www.youtube.com/results?search_query=asmr+waves&sp=EgIwAQ%253D%253D")
 
 	#Scroll down to get more videos
 	#driver.execute_script("scroll(0, 10000);")

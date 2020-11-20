@@ -5,6 +5,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 import time
 import random
+import os, sys
 
 import pandas as pd
 
@@ -16,6 +17,13 @@ def convert(seconds):
     seconds %= 60
       
     return "%d:%02d:%02d" % (hour, minutes, seconds) 
+
+# function to take care of downloading file
+def enable_download_headless(browser,download_dir):
+    browser.command_executor._commands["send_command"] = ("POST", '/session/$sessionId/chromium/send_command')
+    params = {'cmd':'Page.setDownloadBehavior', 'params': {'behavior': 'allow', 'downloadPath': download_dir}}
+    browser.execute("send_command", params)
+
 
 
 if __name__ == "__main__":
@@ -89,9 +97,40 @@ if __name__ == "__main__":
 			except:
 				time.sleep(5)
 
-		driver.find_element_by_xpath("//a[text()=' Download File']").click()
+		#Get link id
+		linkId = links[x][32:]
+		print(linkId)
 
-		time.sleep(120)
+		# change the directory where you would like to place the downloaded file
+		download_dir = "/videos/"
+
+		# function to handle setting up headless download
+		enable_download_headless(driver, download_dir)
+		time.sleep(3)
+
+		#Extracting info
+		downloadElement = driver.find_element_by_xpath("//a[text()=' Download File']")
+
+		downloadLink = downloadElement.get_attribute("href")
+		print(downloadLink)
+
+		pos = downloadLink.find("partial")
+		print(pos)
+
+		downloadName = downloadLink[pos + 8:].replace("%7C", "_")
+		print(downloadName)
+
+		downloadElement.click()
+		time.sleep(3)
+
+		#Change name of downloaded file
+		while True:
+			try:
+				os.rename(download_dir + downloadName, download_dir + linkId + ".mp4")
+				break
+			except:
+				print ("Unexpected error:", sys.exc_info()[0])
+				time.sleep(5)
 
 		driver.quit()
 
